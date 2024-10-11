@@ -4,26 +4,7 @@ const PORT = 8000
 
 const app = express()
 
-app.get('/', (req, res) => res.json({ msg: 'hey from my own server' }));
+app.get('/', (req, res) => res.send('Hey from my own server'));
 
 
-app.listen(PORT, () => console.log(`Serer Strted on port ${PORT}`))
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-                                    
+app.listen(PORT, () => console.log(`Server Started on port ${PORT}`))

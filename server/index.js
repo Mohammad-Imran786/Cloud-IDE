@@ -4,30 +4,38 @@ const fs = require('fs/promises')
 const { Server: SocketServer } = require('socket.io')
 const path = require('path')
 const cors = require('cors')
-const chokidar = require('chokidar');
+const chokidar = require('chokidar')
+const os = require('os')
 
 const pty = require('node-pty')
 
-const ptyProcess = pty.spawn('bash', [], {
+const shell = os.platform() === 'win32' ? 'powershell.exe' : 'bash';
+
+const clientIndexPath = path.join(__dirname, '../client/src')
+
+const ptyProcess = pty.spawn(shell, [], {
     name: 'xterm-color',
     cols: 80,
     rows: 30,
-    cwd: process.env.INIT_CWD + '/user',
+    cwd: clientIndexPath,
     env: process.env
 });
 
 const app = express()
 const server = http.createServer(app);
 const io = new SocketServer({
-    cors: '*'
+    cors: {
+        origin: "*",
+        methods: ["GET", "POST"]
+    }
 })
 
 app.use(cors())
 
 io.attach(server);
 
-chokidar.watch('./user').on('all', (event, path) => {
-    io.emit('file:refresh', path)
+chokidar.watch(clientIndexPath).on('all', (event, filePath) => {
+    io.emit('file:refresh', filePath)
 });
 
 ptyProcess.onData(data => {
@@ -39,8 +47,8 @@ io.on('connection', (socket) => {
 
     socket.emit('file:refresh')
 
-    socket.on('file:change', async ({ path, content }) => {
-        await fs.writeFile(`./user${path}`, content)
+    socket.on('file:change', async ({ filePath, content }) => {
+        await fs.writeFile(clientIndexPath, filePath, content)
     })
 
     socket.on('terminal:write', (data) => {
@@ -50,13 +58,13 @@ io.on('connection', (socket) => {
 })
 
 app.get('/files', async (req, res) => {
-    const fileTree = await generateFileTree('./user');
+    const fileTree = await generateFileTree(clientIndexPath);
     return res.json({ tree: fileTree })
 })
 
 app.get('/files/content', async (req, res) => {
-    const path = req.query.path;
-    const content = await fs.readFile(`./user${path}`, 'utf-8')
+    const filePath = req.query.path;
+    const content = await fs.readFile(path.join(clientIndexPath, filePath), 'utf-8')
     return res.json({ content })
 })
 

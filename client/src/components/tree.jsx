@@ -7,7 +7,7 @@ const FileTreeNode = ({ fileName, nodes, onSelect, path }) => {
         if (isDir) return;
         onSelect(path);
       }}
-      style={{ marginLeft: "10px" }}
+      style={{ marginLeft: "7px", backgroundColor: "#f5f5f5"}}
     >
       <p className={isDir ? "" : "file-node"}>{fileName}</p>
       {nodes && fileName !== "node_modules" && (
@@ -31,4 +31,5 @@ const FileTreeNode = ({ fileName, nodes, onSelect, path }) => {
 const FileTree = ({ tree, onSelect }) => {
   return <FileTreeNode onSelect={onSelect} fileName="/" path="" nodes={tree} />;
 };
+
 export default FileTree;

@@ -82,7 +82,7 @@ function App() {
         <div className="editor">
           {selectedFile && (
             <p>
-              {selectedFile.replaceAll("/", " > ")}{" "}
+              {selectedFile.replaceAll("/", " > ")}{"  "}
               {isSaved ? "Saved" : "Unsaved"}
             </p>
           )}
@@ -90,6 +90,7 @@ function App() {
             width="100%"
             mode={getFileMode({ selectedFile })}
             value={code}
+            editorProps={{ $blockScrolling: false }}
             onChange={(e) => setCode(e)}
           />
         </div>
