@@ -6,7 +6,6 @@ const path = require('path')
 const cors = require('cors')
 const chokidar = require('chokidar')
 const os = require('os')
-
 const pty = require('node-pty')
 
 const shell = os.platform() === 'win32' ? 'powershell.exe' : 'bash';
